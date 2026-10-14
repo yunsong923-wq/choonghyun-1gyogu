@@ -408,15 +408,17 @@ function loadSheet(){
 }
 
 /* 소식지 날짜 자동 계산: 휴대폰 날짜 기준 '돌아오는 일요일'(오늘이 일요일이면 오늘) — 수정 금지.
-   교구모임기도 4칸의 날짜: 그 달의 일요일들. 일요일이 5번인 달은,
-   소식지 날짜가 첫째 일요일이면 앞의 4번, 아니면 뒤의 4번을 사용합니다. */
+   교구모임기도 4칸의 날짜: 돌아오는 일요일부터 4주 연속(예: 10월 18일, 25일, 11월 1일, 8일).
+   달이 바뀌어도 이어서 계산하고, 매주 일요일이 지나면 한 칸씩 앞으로 밀립니다. */
 function autoDates(){
  var n=new Date(),d=new Date(n.getFullYear(),n.getMonth(),n.getDate());
  d.setDate(d.getDate()+(7-d.getDay())%7); /* 오늘 → 돌아오는 일요일 */
- var y=d.getFullYear(),m=d.getMonth(),sun=[],i;
- for(i=1;i<=31;i++){var x=new Date(y,m,i);if(x.getMonth()===m&&x.getDay()===0)sun.push(i)} /* 그 달의 일요일 날짜들 */
- var idx=sun.indexOf(d.getDate()),st=sun.length>4?(idx===0?0:sun.length-4):0;
- return{date:y+"년 "+(m+1)+"월 "+d.getDate()+"일",days:sun.slice(st,st+4).map(function(s){return(m+1)+"월 "+s+"일"})};
+ var days=[],i;
+ for(i=0;i<4;i++){ /* 그 일요일부터 7일씩 더해 4주치 날짜를 만듭니다 (달이 넘어가도 자동 계산) */
+  var x=new Date(d.getFullYear(),d.getMonth(),d.getDate()+7*i);
+  days.push((x.getMonth()+1)+"월 "+x.getDate()+"일");
+ }
+ return{date:d.getFullYear()+"년 "+(d.getMonth()+1)+"월 "+d.getDate()+"일",days:days};
 }
 
 /* =====================================================================
