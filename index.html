@@ -411,15 +411,14 @@ function loadSheet(){
    ① 홈 화면 '소식지 날짜' = 가장 최근 일요일(이번 주 소식지의 날짜). 오늘이 일요일이면 오늘.
       → 월~토요일에는 지난 일요일 날짜를 유지하다가, 일요일 0시가 되면 새 일요일 날짜로 바뀝니다.
       (예: 10월 11일~17일은 '10월 11일', 10월 18일 0시부터는 '10월 18일')
-   ② 교구모임기도 4칸 = '돌아오는 일요일'(오늘이 일요일이면 오늘)부터 4주 연속.
-      달이 바뀌어도 이어서 계산됩니다. (예: 10월 18일, 25일, 11월 1일, 8일) */
+   ② 교구모임기도 4칸 = 맨 왼쪽 칸이 홈 날짜와 같고, 오른쪽 칸으로 갈수록 7일씩 더합니다.
+      달이 바뀌어도 이어서 계산됩니다. (예: 홈 날짜 10월 11일 → 10월 11일, 18일, 25일, 11월 1일) */
 function autoDates(){
  var n=new Date(),today=new Date(n.getFullYear(),n.getMonth(),n.getDate()); /* 오늘 0시 (휴대폰 날짜 기준) */
- var cur=new Date(today.getFullYear(),today.getMonth(),today.getDate()-today.getDay()); /* 지난(또는 오늘) 일요일 → 홈 날짜 */
- var nxt=new Date(today.getFullYear(),today.getMonth(),today.getDate()+(7-today.getDay())%7); /* 돌아오는(또는 오늘) 일요일 → 기도 첫 칸 */
+ var cur=new Date(today.getFullYear(),today.getMonth(),today.getDate()-today.getDay()); /* 지난(또는 오늘) 일요일 → 홈 날짜이자 기도표 첫 칸 */
  var days=[],i;
- for(i=0;i<4;i++){ /* 돌아오는 일요일부터 7일씩 더해 4주치 날짜를 만듭니다 (달이 넘어가도 자동 계산) */
-  var x=new Date(nxt.getFullYear(),nxt.getMonth(),nxt.getDate()+7*i);
+ for(i=0;i<4;i++){ /* 홈 날짜부터 7일씩 더해 4주치 날짜를 만듭니다 (달이 넘어가도 자동 계산) */
+  var x=new Date(cur.getFullYear(),cur.getMonth(),cur.getDate()+7*i);
   days.push((x.getMonth()+1)+"월 "+x.getDate()+"일");
  }
  return{date:cur.getFullYear()+"년 "+(cur.getMonth()+1)+"월 "+cur.getDate()+"일",days:days};
