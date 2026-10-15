@@ -9,6 +9,10 @@
   3. 쪽 이미지(8장 정도)를 내려받아 휴대폰에서 빨리 뜨도록 크기를 줄여 weekly/img/ 폴더에 저장합니다.
   4. weekly/data.json 에 "이번 호는 몇 호, 제목, 쪽 목록"을 기록합니다. (보기 화면이 이 파일을 읽습니다)
 
+  ★ 새 호 자동 찾기: 시트 번호(또는 이미 받아 둔 호)보다 큰 번호를 웹진에서 차례로 찾아보고,
+     실제로 쪽 이미지가 있는 가장 큰 번호를 이번 호로 정합니다. 그래서 시트의 번호를 안 바꿔도 새 호가 올라오면 자동으로 받습니다.
+     (번호가 1씩 늘지 않아도 몇 칸 건너뛴 번호까지 찾아봅니다. 아래 SEARCH_AHEAD 참고)
+
 이 프로그램은 GitHub 서버가 자동으로 실행합니다. 직접 만질 일은 거의 없습니다.
   · 이미 받아 둔 호이면 아무것도 하지 않고 끝납니다.
   · 웹진에 아직 새 호가 올라오지 않았으면 기존 사본을 그대로 두고 끝납니다. (다음 실행 때 다시 시도)
@@ -40,6 +44,8 @@ ALLOWED_HOST = os.environ.get("ALLOWED_HOST", "choonghyunchurch.or.kr")  # 이 �
 MAX_WIDTH = 1400        # 이미지 가로 크기 상한(픽셀). 이보다 크면 줄입니다. 휴대폰에서는 이 정도면 충분합니다
 JPEG_QUALITY = 82       # 사진 품질(1~100). 낮출수록 파일이 작아지고 흐려집니다
 MAX_IMAGE_BYTES = 20 * 1024 * 1024   # 이미지 한 장의 최대 크기(20MB). 넘으면 이상한 파일로 보고 받지 않습니다 — 수정 금지
+AUTO_FIND = os.environ.get("AUTO_FIND", "yes").strip().lower() != "no"   # yes = 새 호를 자동으로 찾기 / no 로 바꾸면 예전처럼 시트의 번호만 사용
+SEARCH_AHEAD = int(os.environ.get("SEARCH_AHEAD", "8"))   # 지금 호 번호보다 몇 번 앞까지 찾아볼지 (8이면 +1 ~ +8). 번호가 건너뛰어도 찾게 하려는 여유분입니다
 HTTP_TIMEOUT = 40       # 한 번 요청을 기다리는 최대 시간(초)
 RETRIES = 4             # 실패하면 다시 시도하는 횟수
 
@@ -163,6 +169,34 @@ def download_and_shrink(url, dest):
     return im.width, im.height
 
 
+def try_page(number):
+    """웹진 번호 하나를 열어 보고, 쪽 이미지 목록이 실제로 있으면 (페이지 글, 주소)를 돌려줍니다. 없거나 접속이 안 되면 None.
+    (새 호를 찾아볼 때 쓰는 가벼운 확인용입니다. 실패해도 오류로 멈추지 않고 '없음'으로 처리합니다)"""
+    url = WEBZINE_BASE.rstrip("/") + "/" + str(number)
+    for ua in (HEADERS["User-Agent"], MOBILE_UA):   # 컴퓨터용으로 안 되면 휴대폰용으로 한 번 더
+        try:
+            r = requests.get(url, headers=dict(HEADERS, **{"User-Agent": ua}), timeout=HTTP_TIMEOUT)
+        except requests.RequestException as e:
+            log("  [찾기] %s번 접속 실패(%s) — 이번에는 건너뜁니다" % (number, type(e).__name__))
+            return None
+        if r.status_code != 200:   # 404 등: 아직 올라오지 않은 번호
+            return None
+        if len(find_pages(r.text)) >= 2:   # 쪽 이미지가 2장 이상이면 진짜 호로 인정
+            return r.text, url
+    return None
+
+
+def find_newest(base):
+    """base(지금 호 번호)보다 큰 번호를 base+1 ~ base+SEARCH_AHEAD 까지 보고, 진짜 호 중 가장 큰 번호를 돌려줍니다. 없으면 None."""
+    best = None
+    for n in range(base + 1, base + SEARCH_AHEAD + 1):
+        got = try_page(n)
+        if got:
+            log("  [찾기] %d호 발견" % n)
+            best = (n, got[0], got[1])
+    return best
+
+
 def read_current():
     try:
         with open(DATA_JSON, encoding="utf-8") as f:
@@ -172,8 +206,31 @@ def read_current():
 
 
 def main():
-    number = get_number()
     cur = read_current()
+    prefetched = None   # 새 호를 찾으면서 이미 읽은 페이지 (다시 읽지 않도록 보관)
+
+    forced = bool(os.environ.get("WEEKLY_NUMBER", "").strip())   # 직접 번호를 지정했는지 ('Run workflow' 에서 입력)
+    try:
+        number = get_number()   # 시트(또는 직접 지정)의 번호
+    except Exception as e:      # 시트를 못 읽어도, 이미 받아 둔 호가 있으면 그 번호로 계속 진행
+        if not cur.get("number"):
+            raise
+        log("시트 번호를 읽지 못해 지금 사본(%s호) 기준으로 진행합니다. (%s)" % (cur["number"], e))
+        number = cur["number"]
+
+    if AUTO_FIND and not forced and number.isdigit():
+        base = int(number)
+        if str(cur.get("number", "")).isdigit():
+            base = max(base, int(cur["number"]))   # 시트 번호가 옛날 번호여도 이미 받은 호보다 뒤로 가지 않게 함
+        log("새 호 찾는 중: %d호 다음 번호부터 %d개를 확인합니다" % (base, SEARCH_AHEAD))
+        newest = find_newest(base)
+        if newest:
+            number, html0, url0 = str(newest[0]), newest[1], newest[2]
+            prefetched = (html0, url0)
+            log("→ 가장 새로운 호: %s호" % number)
+        else:
+            number = str(base)
+            log("→ 새 호 없음. 현재 %s호를 유지합니다." % number)
 
     # 이미 같은 호를 받아 두었고 이미지도 다 있으면 할 일이 없음
     have_all = cur.get("number") == number and cur.get("pages") and all(
@@ -185,7 +242,15 @@ def main():
     page_url = WEBZINE_BASE.rstrip("/") + "/" + number
     log("웹진 페이지 읽는 중: %s" % page_url)
     try:
-        resp = http_get(page_url)
+        if prefetched:   # 새 호를 찾으면서 이미 읽은 페이지가 있으면 그것을 사용
+            class _Resp:   # 아래 진단 코드가 쓰는 모양에 맞춘 임시 틀 — 수정 금지
+                url = prefetched[1]
+                status_code = 200
+                headers = {}
+                text = prefetched[0]
+            resp = _Resp()
+        else:
+            resp = http_get(page_url)
         html = resp.text
         if not find_pages(html):   # 컴퓨터용으로 목록이 없으면 휴대폰용 신분으로 한 번 더
             log("  컴퓨터용 접속에서 목록 없음 → 휴대폰용으로 다시 시도")
