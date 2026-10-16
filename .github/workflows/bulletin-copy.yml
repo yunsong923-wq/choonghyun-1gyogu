@@ -1,0 +1,75 @@
+# 주보(주일예배 순서지) · 금요집회 순서지 사본 자동 만들기 (GitHub 서버가 알아서 실행합니다)
+# =====================================================================
+# 언제 실행되나요?
+#   · 일주일에 한 번, 매주 금요일 오전 6시(한국 시간)에 자동 실행됩니다.
+#     새 주보·금요집회 순서지가 웹진에 올라와 있으면 받아 오고, 없으면 아무것도 하지 않고 끝납니다.
+#   · 시각을 바꾸려면 아래 cron 줄의 숫자를 고칩니다. (세계 표준시 기준이라 한국 시간에서 9시간을 뺍니다)
+#       예) 토요일 밤 9시(한국) → "0 12 * * 6"      금요일 낮 12시(한국) → "0 3 * * 5"
+#   · 급할 때는 직접 실행할 수 있습니다:
+#     GitHub 저장소 → 위쪽 Actions → 왼쪽 '주보·금요집회 사본 만들기' → 오른쪽 'Run workflow' 버튼
+#     (처음에는 번호 칸에 주보 번호, 금요집회 번호를 적어 한 번 실행하면 가장 확실합니다. 평소엔 비워 둡니다)
+# 결과
+#   · 받은 이미지가 sunday 폴더(주보)와 friday 폴더(금요집회)에 저장되고, 잠시 뒤 소식지에 반영됩니다.
+# =====================================================================
+name: 주보·금요집회 사본 만들기
+
+on:
+  schedule:
+    # 시각은 세계 표준시(UTC)입니다. 한국 시간 = UTC + 9시간.  목요일 21:00 UTC = 한국 금요일 06:00
+    - cron: "0 21 * * 4"
+  workflow_dispatch:           # 'Run workflow' 버튼으로 직접 실행하는 기능
+    inputs:
+      sunday_number:
+        description: "주보 번호를 직접 지정하려면 입력 (비워 두면 자동으로 찾음)"
+        required: false
+        default: ""
+      friday_number:
+        description: "금요집회 번호를 직접 지정하려면 입력 (비워 두면 자동으로 찾음)"
+        required: false
+        default: ""
+      force:
+        description: "이미 받은 것도 다시 받으려면 yes 입력"
+        required: false
+        default: ""
+
+permissions:
+  contents: write              # 받은 이미지를 저장소에 저장하려면 필요한 권한 — 수정 금지
+
+concurrency:                   # 주간충현 프로그램과 동시에 저장하다 부딪히지 않게 순서대로 실행하는 설정 — 수정 금지
+  group: weekly-copy
+  cancel-in-progress: false
+
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: 저장소 내려받기
+        uses: actions/checkout@v4
+
+      - name: 파이썬 준비
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 필요한 도구 설치
+        run: pip install requests pillow
+
+      - name: 주보·금요집회 받기
+        env:
+          SUNDAY_NUMBER: ${{ github.event.inputs.sunday_number }}
+          FRIDAY_NUMBER: ${{ github.event.inputs.friday_number }}
+          FORCE: ${{ github.event.inputs.force }}
+        run: python tools/fetch_bulletin.py
+
+      - name: 바뀐 파일이 있으면 저장
+        run: |
+          git config user.name "weekly-bot"
+          git config user.email "weekly-bot@users.noreply.github.com"
+          git add sunday friday
+          if git diff --cached --quiet; then
+            echo "바뀐 내용 없음"
+          else
+            git commit -m "주보·금요집회 사본 갱신"
+            git push
+          fi
