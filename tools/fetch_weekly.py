@@ -10,7 +10,7 @@
   4. weekly/data.json 에 "이번 호는 몇 호, 제목, 쪽 목록"을 기록합니다. (보기 화면이 이 파일을 읽습니다)
 
   ★ 새 호 자동 찾기: 시트 번호(또는 이미 받아 둔 호)보다 큰 번호를 웹진에서 차례로 찾아보고,
-     실제로 쪽 이미지가 있는 가장 큰 번호를 이번 호로 정합니다. 그래서 시트의 번호를 안 바꿔도 새 호가 올라오면 자동으로 받습니다.
+     실제로 쪽 이미지가 있고 제목에 '주간충현'이 들어 있는 가장 큰 번호를 이번 호로 정합니다. (금요집회순서지 등 다른 글은 건너뜁니다) 그래서 시트의 번호를 안 바꿔도 새 호가 올라오면 자동으로 받습니다.
      (번호가 1씩 늘지 않아도 몇 칸 건너뛴 번호까지 찾아봅니다. 아래 SEARCH_AHEAD 참고)
 
 이 프로그램은 GitHub 서버가 자동으로 실행합니다. 직접 만질 일은 거의 없습니다.
@@ -45,6 +45,7 @@ MAX_WIDTH = 1400        # 이미지 가로 크기 상한(픽셀). 이보다 크�
 JPEG_QUALITY = 82       # 사진 품질(1~100). 낮출수록 파일이 작아지고 흐려집니다
 MAX_IMAGE_BYTES = 20 * 1024 * 1024   # 이미지 한 장의 최대 크기(20MB). 넘으면 이상한 파일로 보고 받지 않습니다 — 수정 금지
 AUTO_FIND = os.environ.get("AUTO_FIND", "yes").strip().lower() != "no"   # yes = 새 호를 자동으로 찾기 / no 로 바꾸면 예전처럼 시트의 번호만 사용
+TITLE_KEYWORD = os.environ.get("TITLE_KEYWORD", "주간충현")   # 새 호를 자동으로 찾을 때, 페이지 제목에 이 글자가 들어 있는 호만 인정합니다. 같은 웹진에 올라오는 '금요집회순서지' 같은 다른 글을 걸러 내기 위한 장치입니다 (비우면 이 검사를 하지 않음)
 SEARCH_AHEAD = int(os.environ.get("SEARCH_AHEAD", "8"))   # 지금 호 번호보다 몇 번 앞까지 찾아볼지 (8이면 +1 ~ +8). 번호가 건너뛰어도 찾게 하려는 여유분입니다
 HTTP_TIMEOUT = 40       # 한 번 요청을 기다리는 최대 시간(초)
 RETRIES = 4             # 실패하면 다시 시도하는 횟수
@@ -181,7 +182,11 @@ def try_page(number):
             return None
         if r.status_code != 200:   # 404 등: 아직 올라오지 않은 번호
             return None
-        if len(find_pages(r.text)) >= 2:   # 쪽 이미지가 2장 이상이면 진짜 호로 인정
+        if len(find_pages(r.text)) >= 2:   # 쪽 이미지가 2장 이상 있는 페이지만 후보로 봅니다
+            title = find_title(r.text, number)
+            if TITLE_KEYWORD and TITLE_KEYWORD not in title:   # 제목에 '주간충현'이 없으면 다른 글(예: 금요집회순서지)이므로 건너뜀
+                log("  [찾기] %s번은 주간충현이 아니라서 건너뜁니다: %s" % (number, title))
+                return None
             return r.text, url
     return None
 
