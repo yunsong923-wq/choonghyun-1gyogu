@@ -192,6 +192,7 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 .ins-b button{min-width:92px;height:42px;padding:0 16px;border:0;border-radius:4px;background:#111;color:#fff;font-size:17px;font-family:inherit;cursor:pointer} /* 버튼: 검정 바탕 흰 글자 (시안 사진과 같은 모양) */
 .ins-b button:active{transform:scale(.96)}
 .ins-b .blink{animation:blink 1s ease-in-out infinite} /* '설치' 버튼 깜빡임 */
+.ins-n{font-size:13px;line-height:1.55;margin:-4px 0 14px;padding:8px 10px;border-radius:6px;background:rgba(255,255,255,.55);color:#7a2a00;word-break:keep-all} /* '주의' 문구: 작은 글씨(13px), 짙은 주황 글자, 반투명 흰 바탕 */
 .ins-s{width:30px;height:30px;margin:0 auto 12px;border:4px solid #d8c18a;border-top-color:#111;border-radius:50%;animation:spin 1s linear infinite} /* 기다리는 동안 도는 동그라미 */
 @keyframes blink{50%{opacity:.35}} /* 깜빡이는 동작 (수정 금지) */
 
@@ -913,7 +914,11 @@ var INS_TEXT={
  ready:   "준비되었습니다.\n아래 '설치' 버튼을 눌러 주세요.",                                       /* 설치 준비가 끝났을 때 */
  manual:  "크롬 오른쪽 위의 ⋮ (점 3개) 메뉴를 누른 뒤\n'홈 화면에 추가' 또는 '앱 설치'를 눌러 주세요.", /* 크롬이 설치 창을 띄워 주지 않을 때 */
  already: "바탕화면에 이미 아이콘이 설치되어 있습니다.\n바탕화면의 '1교구 소식지' 아이콘을 눌러 주세요.", /* 이미 설치되어 있을 때 */
- done:    "설치되었습니다!\n이제 바탕화면의 '1교구 소식지' 아이콘으로 여실 수 있습니다."             /* 설치가 끝났을 때 */
+ done:    "설치되었습니다!\n이제 바탕화면의 '1교구 소식지' 아이콘으로 여실 수 있습니다.",            /* 설치가 끝났을 때 */
+ /* ▼ 아이폰 사용자를 위한 '주의' 문구 (안내창 아래쪽에 작은 글씨로 나옵니다) */
+ iosKakaoNote:"※ 주의: 사파리로 바뀌지 않으면, 카카오톡 화면 아래(또는 위)의 ⋯ 버튼을 눌러 'Safari로 열기'를 선택해 주세요.", /* ③ 아이폰 카카오톡 안내창 아래 */
+ iosNote:  "※ 주의: 아이폰은 반드시 사파리(Safari)에서 설치해야 합니다. 공유 버튼이 안 보이면 화면을 살짝 아래로 내렸다가 올려 보세요.", /* ④ 아이폰 설치 방법 아래 */
+ iosStuck: "사파리로 바뀌지 않았습니다.\n카카오톡 화면 아래(또는 위)의 ⋯ 버튼을 누른 뒤 'Safari로 열기'를 선택해 주세요.\n사파리에서 소식지가 열리면 설치 방법을 안내해 드립니다." /* 3초가 지나도 카카오톡에 그대로 있을 때 */
 };
 var INS_WAIT_MAX=40000; /* 크롬의 설치 준비를 기다리는 최대 시간. 40000 = 40초. 넘으면 '메뉴로 설치하는 방법'을 안내 */
 var IOS_DONE_KEY="n1_ios_installed"; /* 아이폰에서 '설치했어요'를 누른 기록 이름 — 수정 금지 */
@@ -964,7 +969,7 @@ function insTry(){ /* 지금 안내창을 띄울 때인지 확인하고, 때가 
  if(!document.getElementById("home").classList.contains("on"))return; /* 홈 화면일 때만 */
  if(document.getElementById("ins").classList.contains("on"))return;  /* 이미 떠 있으면 */
  if(insEnv==="kakao"){if(insDue)insMsg(INS_TEXT.kakao,[[INS_YES,insToChrome],[INS_NO,insNoClick]]);return}
- if(insEnv==="iosKakao"){if(insDue)insMsg(INS_TEXT.iosKakao,[[INS_YES,insToSafari],[INS_NO,insNoClick]]);return}
+ if(insEnv==="iosKakao"){if(insDue)insShow('<p class="ins-m">'+insText(INS_TEXT.iosKakao)+'</p><p class="ins-n">'+insText(INS_TEXT.iosKakaoNote)+'</p>',[[INS_YES,insToSafari],[INS_NO,insNoClick]]);return} /* 안내 글 + 주의 문구 */
  if(insEnv==="ios"){
   if(tryGet(IOS_DONE_KEY))return;                        /* 이 휴대폰에서 '설치했어요'를 눌렀으면 안 띄움 */
   if(insDue||insArrived)insMsg(INS_TEXT.ios,[[INS_YES,insIosGuide],[INS_NO,insNoClick]]);
@@ -991,12 +996,16 @@ function insToChrome(){ /* 안드로이드 카카오톡 → 크롬으로 전환 
 function insToSafari(){ /* 아이폰 카카오톡 → 사파리로 전환 — 수정 금지 */
  insNo=true;insHide();
  location.href="kakaotalk://web/openExternal?url="+encodeURIComponent(insUrl()); /* 카카오톡 전용 '외부 브라우저로 열기' 명령 */
+ setTimeout(function(){ /* 3초 뒤에도 카카오톡 화면 그대로면(사파리로 안 넘어감) → 직접 여는 방법 안내 */
+  if(document.visibilityState==="visible"){insDone=false;insMsg(INS_TEXT.iosStuck,[["확인",insClose]])}
+ },3000);
 }
 function insIosGuide(){ /* 아이폰 설치 방법 안내 — 수정 금지 */
  insShow('<p class="ins-m">'+insText(INS_TEXT.iosGuide)+'</p><ol class="ins-g">'+
   '<li>화면 아래(또는 위)의 <b>공유</b> 버튼 '+SHARE_ICON+' 누르기</li>'+
   '<li>목록을 올려 <b>홈 화면에 추가</b> 누르기</li>'+
-  '<li>오른쪽 위 <b>추가</b> 누르기</li></ol>',
+  '<li>오른쪽 위 <b>추가</b> 누르기</li></ol>'+
+  '<p class="ins-n">'+insText(INS_TEXT.iosNote)+'</p>', /* 주의 문구 */
   [["확인",insClose],["설치했어요",function(){trySet(IOS_DONE_KEY,"1");insHide()}]]); /* '설치했어요' = 이 휴대폰(사파리)에서는 다시 안 띄움 */
 }
 function insInstall(){ /* 크롬: '네'를 누르면 설치 창 열기 — 수정 금지 */
