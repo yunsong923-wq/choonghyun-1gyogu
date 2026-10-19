@@ -25,7 +25,7 @@
     · 목모임 명단은 구글 시트의 '목모임' 탭에서 고칩니다.
  ★ 아이콘 설치를 위해 이 파일 옆에 아래 파일들이 함께 있어야 합니다. (GitHub 저장소 맨 위 폴더)
     manifest.json(앱 이름·아이콘 설정), sw.js(설치용 작동 파일),
-    아이콘 그림 4장(icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png)
+    icons 폴더(아이콘 그림 4장: icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png)
 =====================================================================
 -->
 <html lang="ko">
@@ -40,7 +40,7 @@
 <!-- ▼ [⑦ 아이콘 설치] 바탕화면 아이콘으로 설치할 수 있게 하는 설정들 -->
 <link rel="manifest" href="manifest.json"> <!-- 앱 이름·아이콘·시작 화면을 적어 둔 설정 파일 (같은 폴더의 manifest.json). 바탕화면 아이콘 이름을 바꾸려면 그 파일의 "short_name" 을 고치세요 -->
 <meta name="theme-color" content="#ffe930"> <!-- 설치한 앱의 맨 위 상태 표시줄 색 (노란 제목 줄과 같은 색) -->
-<link rel="apple-touch-icon" href="apple-touch-icon.png"> <!-- 아이폰 바탕화면 아이콘 그림 -->
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"> <!-- 아이폰 바탕화면 아이콘 그림 (icons 폴더 안) -->
 <meta name="apple-mobile-web-app-capable" content="yes"> <!-- 아이폰: 바탕화면 아이콘으로 열면 주소창 없이 앱처럼 보이게 -->
 <meta name="mobile-web-app-capable" content="yes"> <!-- 안드로이드: 위와 같은 설정 -->
 <meta name="apple-mobile-web-app-title" content="1교구 소식지"> <!-- 아이폰 바탕화면 아이콘 아래에 나오는 이름 -->
