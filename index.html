@@ -24,7 +24,8 @@
  ⑧ 목모임 보기             : 홈 아래 가운데 하늘색 사람 버튼 → 원형 숫자판 → 목모임 명단 (아래 <script> 의 "⑧" 부분)
     · 목모임 명단은 구글 시트의 '목모임' 탭에서 고칩니다.
  ★ 아이콘 설치를 위해 이 파일 옆에 아래 파일들이 함께 있어야 합니다. (GitHub 저장소 맨 위 폴더)
-    manifest.json(앱 이름·아이콘 설정), sw.js(설치용 작동 파일), icons 폴더(아이콘 그림 4장)
+    manifest.json(앱 이름·아이콘 설정), sw.js(설치용 작동 파일),
+    아이콘 그림 4장(icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png)
 =====================================================================
 -->
 <html lang="ko">
@@ -39,7 +40,7 @@
 <!-- ▼ [⑦ 아이콘 설치] 바탕화면 아이콘으로 설치할 수 있게 하는 설정들 -->
 <link rel="manifest" href="manifest.json"> <!-- 앱 이름·아이콘·시작 화면을 적어 둔 설정 파일 (같은 폴더의 manifest.json). 바탕화면 아이콘 이름을 바꾸려면 그 파일의 "short_name" 을 고치세요 -->
 <meta name="theme-color" content="#ffe930"> <!-- 설치한 앱의 맨 위 상태 표시줄 색 (노란 제목 줄과 같은 색) -->
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"> <!-- 아이폰 바탕화면 아이콘 그림 -->
+<link rel="apple-touch-icon" href="apple-touch-icon.png"> <!-- 아이폰 바탕화면 아이콘 그림 -->
 <meta name="apple-mobile-web-app-capable" content="yes"> <!-- 아이폰: 바탕화면 아이콘으로 열면 주소창 없이 앱처럼 보이게 -->
 <meta name="mobile-web-app-capable" content="yes"> <!-- 안드로이드: 위와 같은 설정 -->
 <meta name="apple-mobile-web-app-title" content="1교구 소식지"> <!-- 아이폰 바탕화면 아이콘 아래에 나오는 이름 -->
@@ -180,9 +181,11 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 /* =====================================================================
    ⑦ 바탕화면 아이콘 설치 팝업 (홈 화면 1분 뒤 아래에서 부드럽게 올라오는 안내창)
    ===================================================================== */
-.ins{position:fixed;left:0;right:0;bottom:0;z-index:25;max-width:480px;margin:0 auto;background:#efd9a3;color:#111;border-top:2px solid #b89a55;border-radius:14px 14px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);padding:16px 18px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .6s ease;visibility:hidden} /* 안내창: 배경 연한 황토색(#efd9a3), 평소엔 화면 아래로 숨어 있음. .6s = 올라오는 데 걸리는 시간(0.6초) */
+.ins{position:fixed;left:0;right:0;bottom:0;z-index:25;max-width:480px;margin:0 auto;background:#efd9a3;color:#111;border-top:2px solid #b89a55;border-radius:14px 14px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.25);padding:16px 18px calc(18px + env(safe-area-inset-bottom,0px));transform:translateY(110%);transition:transform .6s ease;visibility:hidden;max-height:85vh;display:flex;flex-direction:column} /* 안내창: 배경 연한 황토색(#efd9a3), 평소엔 화면 아래로 숨어 있음. .6s = 올라오는 데 걸리는 시간(0.6초). ★ 높이는 안내 글의 길이에 맞춰 자동으로 늘어나고 줄어듭니다. 화면의 85%(85vh)까지만 커집니다 */
+#insBody{flex:1 1 auto;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch} /* 안내 글 부분: 글이 아주 길면 이 부분만 위아래로 밀어 볼 수 있고, 아래 버튼은 항상 보입니다 */
+#insBtns{flex:none} /* 버튼 줄은 크기 고정 (항상 보임) */
 .ins.on{transform:translateY(0);visibility:visible} /* 안내창이 올라온 상태 */
-.ins-m{font-size:15px;line-height:1.65;margin:0 0 14px;word-break:keep-all} /* 안내 글자 크기 15px. keep-all = 낱말 중간에서 줄이 바뀌지 않게 */
+.ins-m{font-size:15px;line-height:1.65;margin:0 0 14px;word-break:keep-all;overflow-wrap:anywhere} /* 안내 글자 크기 15px. keep-all = 낱말 중간에서 줄이 바뀌지 않게 */
 .ins-g{margin:0 0 14px;padding-left:22px;font-size:15px;line-height:1.8} /* 아이폰 설치 방법(1, 2, 3 단계) 목록 */
 .ins-g svg{width:18px;height:18px;vertical-align:-3px;fill:none;stroke:#0a62d0;stroke-width:2} /* 아이폰 '공유' 버튼 모양 그림 */
 .ins-b{display:flex;justify-content:center;gap:22px} /* 네 / 아니오 버튼을 가운데에 나란히. gap = 버튼 사이 간격 */
