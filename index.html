@@ -796,7 +796,8 @@ var TIP_TEXT="나가기";   /* 풍선 말 글자 */
 var EXIT_DELAY=1500;      /* 풍선이 보인 뒤 종료되기까지 기다리는 시간. 1000 = 1초 (1500 = 1.5초). 더 오래 보이게 하려면 숫자를 올리세요 */
 /* ▼ 창이 안 닫힐 때 나오는 '종료 화면'의 글자 (수정 가능) */
 var BYE_TITLE="소식지를 종료했습니다";   /* 종료 화면 제목 */
-var BYE_MSG="화면 위의 X 버튼 또는\n휴대폰의 뒤로가기를 눌러\n창을 닫아 주세요.";   /* 안내 글자. \n 은 줄바꿈입니다 */
+var BYE_MSG="화면 위의 X 버튼 또는\n휴대폰의 뒤로가기를 눌러\n창을 닫아 주세요.";   /* 안내 글자 (인터넷 창으로 열었을 때). \n 은 줄바꿈입니다 */
+var BYE_MSG_APP="휴대폰의 홈 버튼을 눌러 주세요.\n\n홈 버튼이 없는 휴대폰은\n화면 맨 아래에서 위로 쓸어 올리면\n바탕화면으로 나갑니다.";   /* ★ 바탕화면 아이콘으로 열었을 때의 안내 글자 (이때는 화면 위 X 버튼이 없습니다) */
 var BYE_BTN="다시 보기";                  /* 종료 화면의 버튼 글자 */
 var exiting=false; /* 나가기가 이미 진행 중인지 표시 (여러 번 눌러도 한 번만 실행) — 수정 금지 */
 var tipTimer=null; /* 풍선을 숨기는 예약 시계 — 수정 금지 */
@@ -820,7 +821,8 @@ function doExit(){ /* 실제로 앱을 닫는 부분 — 수정 금지 */
 }
 function showBye(){ /* 종료 화면을 보여 줍니다 — 수정 금지 */
  document.getElementById("byeT").textContent=BYE_TITLE;
- document.getElementById("byeM").innerHTML=esc(BYE_MSG).replace(/\n/g,"<br>"); /* \n 을 줄바꿈으로 바꿈 */
+ var asApp=matchMedia("(display-mode: standalone)").matches||navigator.standalone; /* 바탕화면 아이콘으로 열었는지 확인 */
+ document.getElementById("byeM").innerHTML=esc(asApp?BYE_MSG_APP:BYE_MSG).replace(/\n/g,"<br>"); /* 열린 방법에 맞는 안내 글자. \n 을 줄바꿈으로 바꿈 */
  document.getElementById("byeB").textContent=BYE_BTN;
  document.getElementById("tip").classList.remove("on");
  document.getElementById("bye").style.display="flex";
