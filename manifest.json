@@ -1,0 +1,21 @@
+{
+  "name": "충현교회 1교구 소식지",
+  "short_name": "1교구 소식지",
+  "description": "충현교회 1교구 소식을 확인하세요",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#ffe930",
+  "related_applications": [
+    { "platform": "webapp", "url": "https://yunsong923-wq.github.io/choonghyun-1gyogu/manifest.json" }
+  ],
+  "prefer_related_applications": false,
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
