@@ -25,6 +25,7 @@
     · 목모임 명단은 구글 시트의 '목모임' 탭에서 고칩니다.
  ⑨ 실시간 예배 방송   : 홈 아래 보라색 비디오 카메라 버튼 → 풍선 '실시간 예배 방송을 보시겠습니까?' → 네 → 교회 유튜브 라이브
     · 유튜브 주소는 아래 <script> 의 "⑨" 부분(LIVE_URL)에서 고칩니다.
+ ⑩ 나가기 확인       : 나가기(걷는 사람) 버튼 → 풍선 '종료할까요?' → 네 → 종료 / 아니오 → 계속 보기 (아래 <script> 의 "④" 부분)
  ★ 아이콘 설치를 위해 이 파일 옆에 아래 파일들이 함께 있어야 합니다. (GitHub 저장소 맨 위 폴더)
     manifest.json(앱 이름·아이콘 설정), sw.js(설치용 작동 파일),
     icons 폴더(아이콘 그림 4장: icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png)
@@ -108,6 +109,15 @@ table{border-collapse:collapse;width:100%} /* 표 공통 설정 (수정 금지) 
 .tip{position:absolute;left:8px;bottom:62px;background:#333;color:#fff;font-size:14px;padding:7px 14px;border-radius:8px;max-width:calc(100% - 16px);opacity:0;pointer-events:none} /* 풍선 말: bottom:62px = 버튼 바로 위, 배경 짙은 회색, 글자 흰색 14px. 평소엔 투명(opacity:0)이라 안 보이고, 켜지면 곧바로 나타남. 긴 글은 화면 폭에 맞춰 줄바꿈 */
 .tip::after{content:"";position:absolute;left:20px;top:100%;border:7px solid transparent;border-top-color:#333} /* 풍선 아래의 작은 삼각형 꼬리 (색은 위의 #333 과 같게) */
 .tip.on{opacity:1} /* 풍선 말이 나타날 때 */
+/* ▼ [마지막 추가] 나가기 확인 풍선 '종료할까요?' + 네/아니오 — 나가기 버튼 바로 위 */
+.xq{display:none;position:absolute;left:8px;bottom:64px;z-index:6;width:200px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* 짙은 회색 바탕에 흰 글자. 평소엔 숨김 */
+.xq.on{display:block} /* 풍선이 나타날 때 */
+.xq::after{content:"";position:absolute;left:20px;top:100%;border:8px solid transparent;border-top-color:#333} /* 풍선 아래 꼬리 (나가기 버튼을 가리킴) */
+.xq .q{font-size:17px;font-weight:700;margin:0 0 10px} /* 풍선 속 질문 글자 '종료할까요?' */
+.xq .r{display:flex;gap:8px} /* 네 / 아니오 두 버튼을 나란히 */
+.xq button{flex:1;height:42px;border:0;border-radius:8px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer} /* 풍선 속 버튼 공통 */
+.xq .y{background:#555;color:#fff;border:1px solid #888} /* '네' 버튼 색 (진회색) */
+.xq .n{background:#e6e6e6;color:#111} /* '아니오' 버튼 색 */
 
 /* ▼ 예배순서지(주보) 아이콘 + 풍선 — 홈 화면 오른쪽 아래. 나가기(걷는 사람) 버튼과 같은 높이에 있습니다 */
 .bul{position:absolute;right:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* right/bottom = 아이콘 위치(오른쪽·아래에서 떨어진 거리), width/height = 크기, 배경 = 투명(transparent, 그림만 보임). 흰 원을 다시 원하면 transparent 를 rgba(255,255,255,.75) 로 바꾸세요 */
@@ -275,7 +285,8 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 </div>
 <!-- 나가기 버튼: 걸어가는 사람 그림. 누르면 풍선 말 "나가기"가 잠깐 나온 뒤 앱이 종료됩니다 (동작은 아래 ④ 나가기 부분) -->
 <button class="exit" id="exit" aria-label="나가기"><svg viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9 7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7"/></svg></button>
-<div class="tip" id="tip">나가기</div> <!-- 풍선 말. 글자를 바꾸려면 아래 ④ 의 TIP_TEXT 를 고치세요 -->
+<div class="tip" id="tip">나가기</div>
+<div class="xq" id="xq"></div> <!-- [마지막 추가] '종료할까요?' 확인 풍선이 들어가는 자리 (내용은 아래 ④ 에서 채웁니다) --> <!-- 풍선 말. 글자를 바꾸려면 아래 ④ 의 TIP_TEXT 를 고치세요 -->
 <!-- 예배순서지(주보) 아이콘: 누르면 풍선 '주보 / 네·아니오'가 나오고, '네'를 누르면 주보·금요집회 두 항목이 나옵니다 (동작은 아래 ⑥ 예배순서지 부분) -->
 <button class="bul" id="bul" aria-label="예배순서지"><svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h5"/><path d="M13 2l5 5v3"/><path d="M13 2v5h5"/><path d="M8 11h5M8 14.5h2.5"/><circle cx="16" cy="16" r="3.2"/><path d="M18.4 18.4 21 21"/></svg></button>
 <div class="bq" id="bq"></div> <!-- 풍선이 들어가는 자리 (내용은 프로그램이 채웁니다) -->
@@ -776,7 +787,7 @@ function show(name){
  SCREENS.forEach(function(n){document.getElementById(n).classList.toggle("on",n===name)});
  window.scrollTo(0,0);
  if(name==="home"){startMq();insTry()}  /* 홈으로 오면 문구 흐름 시작 + (때가 되었으면) ⑦ 아이콘 설치 안내 */
- else{insHide(true);mokClose();liveClose()}         /* 다른 화면으로 가면 설치 안내창·목모임 풍선은 잠시 내려 둠 */
+ else{insHide(true);mokClose();liveClose();exitClose()}         /* 다른 화면으로 가면 설치 안내창·목모임 풍선은 잠시 내려 둠 */
 }
 
 /* 버튼을 눌렀을 때의 동작 — 수정 금지.
@@ -802,15 +813,20 @@ window.addEventListener("resize",function(){if(document.getElementById("home").c
 /* =====================================================================
    ④ 나가기 (걸어가는 사람 그림을 눌렀을 때)
    ---------------------------------------------------------------------
-   순서: ① 손가락이 닿자마자 풍선 말 "나가기" 표시  →  ② 잠깐 기다림  →  ③ 앱 종료
+   순서: ① 버튼을 누르면 풍선 '종료할까요?' + [네][아니오]
+         ② 아니오 → 풍선 닫힘 (소식지 계속 보기)
+         ③ 네     → 풍선 말 "나가기" 잠깐 표시  →  앱 종료
    ★ 카카오톡 링크로 열었을 때는 카카오톡 안의 창이 닫힙니다.
    ★ 일반 인터넷 앱(크롬, 사파리 등)은 보안 때문에 스스로 닫히지 않을 수 있습니다.
       그럴 때는 화면 전체가 "종료 화면"으로 바뀌어, 앱이 끝난 것처럼 보이고
       닫는 방법을 안내합니다. ("다시 보기"를 누르면 처음 화면으로 돌아옵니다)
    수정 가능한 값은 아래와 같습니다.
    ===================================================================== */
-var TIP_TEXT="나가기";   /* 풍선 말 글자 */
-var EXIT_DELAY=1500;      /* 풍선이 보인 뒤 종료되기까지 기다리는 시간. 1000 = 1초 (1500 = 1.5초). 더 오래 보이게 하려면 숫자를 올리세요 */
+var EXIT_ASK="종료할까요?"; /* [마지막 추가] 나가기 버튼을 누르면 먼저 나오는 확인 글자 */
+var EXIT_YES="네";        /* 확인 풍선의 첫 번째 버튼 글자 (종료) */
+var EXIT_NO="아니오";     /* 확인 풍선의 두 번째 버튼 글자 (취소) */
+var TIP_TEXT="나가기";   /* '네'를 누른 뒤 잠깐 보이는 풍선 말 글자 */
+var EXIT_DELAY=1000;      /* '네'를 누르고 풍선 말이 보인 뒤 종료되기까지 기다리는 시간. 1000 = 1초 (1500 = 1.5초). 이미 '네'로 확인했으므로 1초로 줄였습니다. 더 오래 보이게 하려면 숫자를 올리세요 */
 /* ▼ 창이 안 닫힐 때 나오는 '종료 화면'의 글자 (수정 가능) */
 var BYE_TITLE="소식지를 종료했습니다";   /* 종료 화면 제목 */
 var BYE_MSG="화면 위의 X 버튼 또는\n휴대폰의 뒤로가기를 눌러\n창을 닫아 주세요.";   /* 안내 글자 (인터넷 창으로 열었을 때). \n 은 줄바꿈입니다 */
@@ -850,17 +866,26 @@ document.getElementById("byeB").addEventListener("click",function(){ /* '다시 
  location.hash="home";
  show("home");
 });
-var exitBtn=document.getElementById("exit");
-exitBtn.addEventListener("pointerdown",function(){ /* ① 손가락이 닿는 순간 풍선 말을 먼저 보여 줍니다 — 수정 금지 */
+var exitBtn=document.getElementById("exit"),exitBox=document.getElementById("xq");
+function exitClose(){exitBox.classList.remove("on")} /* '종료할까요?' 풍선 닫기 — 수정 금지 */
+exitBtn.addEventListener("click",function(e){ /* ① 나가기 버튼을 누르면: '종료할까요?' 풍선 열기 (이미 열려 있으면 닫기) — 수정 금지 */
+ e.stopPropagation();
  if(exiting)return;
+ bulClose();mokClose();liveClose(); /* 다른 풍선들은 닫기 */
+ if(exitBox.classList.contains("on")){exitClose();return}
+ exitBox.innerHTML='<div class="q">'+esc(EXIT_ASK)+'</div><div class="r"><button class="y" data-a="y">'+esc(EXIT_YES)+'</button><button class="n" data-a="n">'+esc(EXIT_NO)+'</button></div>';
+ exitBox.classList.add("on");
+});
+exitBox.addEventListener("click",function(e){ /* 풍선 속 버튼을 눌렀을 때 — 수정 금지 */
+ e.stopPropagation();
+ var b=e.target.closest("button");if(!b)return;
+ exitClose();
+ if(b.dataset.a!=="y")return;     /* ② 아니오 → 그냥 닫힘 */
+ exiting=true;                    /* ③ 네 → 풍선 말 "나가기"를 보여 준 뒤 종료 */
  showTip(TIP_TEXT);
+ setTimeout(doExit,EXIT_DELAY);
 });
-exitBtn.addEventListener("click",function(){ /* ② 손가락을 떼면 잠깐 뒤에 종료합니다 — 수정 금지 */
- if(exiting)return;
- exiting=true;
- showTip(TIP_TEXT);              /* (안전하게 한 번 더) 풍선 말 표시 */
- setTimeout(doExit,EXIT_DELAY);  /* 풍선을 보여 준 뒤 종료 */
-});
+document.addEventListener("click",exitClose); /* 풍선 바깥을 누르면 닫힘 — 수정 금지 */
 exitBtn.addEventListener("pointercancel",function(){ /* 누르다가 손가락이 벗어나 취소되면 풍선을 숨깁니다 — 수정 금지 */
  if(!exiting){document.getElementById("tip").classList.remove("on")}
 });
@@ -891,7 +916,7 @@ function bulItems(){ /* 2단계: 주보 / 금요집회 항목 보여 주기 — 
 bulBtn.addEventListener("click",function(e){ /* 아이콘을 누르면: 풍선이 있으면 닫고, 없으면 1단계 열기 — 수정 금지 */
  e.stopPropagation();
  document.getElementById("tip").classList.remove("on"); /* 나가기 풍선이 떠 있으면 숨김 */
- liveClose(); /* ⑨ 실시간 방송 풍선도 닫기 */
+ liveClose();exitClose(); /* ⑨ 실시간 방송·나가기 확인 풍선도 닫기 */
  if(bulBox.classList.contains("on"))bulClose();else bulAsk();
 });
 bulBox.addEventListener("click",function(e){ /* 풍선 안의 버튼을 눌렀을 때 — 수정 금지 */
@@ -924,7 +949,7 @@ var lvBtn=document.getElementById("livBtn"),lvBox=document.getElementById("lq");
 function liveClose(){lvBox.classList.remove("on")} /* 풍선 닫기 — 수정 금지 */
 lvBtn.addEventListener("click",function(e){ /* 버튼을 누르면: 풍선이 있으면 닫고, 없으면 열기 — 수정 금지 */
  e.stopPropagation();
- bulClose();mokClose();document.getElementById("tip").classList.remove("on"); /* 다른 풍선들은 닫기 */
+ bulClose();mokClose();exitClose();document.getElementById("tip").classList.remove("on"); /* 다른 풍선들은 닫기 */
  if(lvBox.classList.contains("on")){liveClose();return}
  lvBox.innerHTML='<div class="q">'+esc(LIVE_ASK).replace(/\n/g,"<br>")+'</div><div class="r"><button class="y" data-a="y">'+esc(LIVE_YES)+'</button><button class="n" data-a="n">'+esc(LIVE_NO)+'</button></div>';
  lvBox.classList.add("on");
@@ -1133,7 +1158,7 @@ var mkTimer=null,mkHeld=false,mkDown=-1,mkX=0,mkY=0; /* 길게 누르기 확인�
 function mokClose(){mkBox.classList.remove("on")} /* 풍선 닫기 — 수정 금지 */
 mkBtn.addEventListener("click",function(e){ /* 버튼을 누르면: 풍선이 있으면 닫고, 없으면 열기 — 수정 금지 */
  e.stopPropagation();
- bulClose();liveClose();document.getElementById("tip").classList.remove("on"); /* 주보·실시간 방송·나가기 풍선은 닫기 */
+ bulClose();liveClose();exitClose();document.getElementById("tip").classList.remove("on"); /* 주보·실시간 방송·나가기 풍선은 닫기 */
  if(mkBox.classList.contains("on")){mokClose();return}
  mkBox.innerHTML='<div class="q">'+esc(MOK_ASK)+'</div><div class="r"><button class="y" data-a="y">'+esc(MOK_YES)+'</button><button class="n" data-a="n">'+esc(MOK_NO)+'</button></div>';
  mkBox.classList.add("on");
