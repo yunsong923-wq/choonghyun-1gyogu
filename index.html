@@ -214,7 +214,7 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
    ⑧ 목모임: 하늘색 두 사람 버튼 + 풍선 + 원형 숫자판 + 명단 화면
    ===================================================================== */
 .mok{position:absolute;left:calc(35px + (100% - 70px)/3);bottom:10px;margin-left:-24px;width:48px;height:48px;border:0;border-radius:8px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* [⑨ 추가로 위치 변경] 아이콘 4개를 같은 간격으로: 왼쪽에서 두 번째 자리. 목모임 버튼: 바탕 없이(transparent) 그림만 보임, 누르는 자리 크기 48px */
-.mok svg{width:44px;height:40px;fill:#1bdaf1} /* 하늘색 두 사람 그림: 크기(너비 44px·높이 40px)와 색(하늘색 #1bdaf1). 색을 바꾸려면 이 번호를 바꾸세요 */
+.mok svg{width:32px;height:29px;fill:#1bdaf1} /* 하늘색 두 사람 그림: 크기(너비 32px·높이 29px — 다른 하단 아이콘과 비슷한 크기. 예전 크기는 44px·40px)와 색(하늘색 #1bdaf1). 색을 바꾸려면 이 번호를 바꾸세요 */
 .mok:active{transform:scale(.92)}
 .mkq{display:none;position:absolute;left:calc(35px + (100% - 70px)/3);bottom:66px;transform:translateX(-50%);z-index:6;min-width:220px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* '목모임을 열까요?' 풍선: 버튼 바로 위 가운데 */
 .mkq.on{display:block}
