@@ -78,6 +78,9 @@
 
 *{box-sizing:border-box} /* 칸 크기 계산 방식 (수정 금지) */
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",sans-serif;-webkit-text-size-adjust:100%} /* 전체 바탕색·글자색·글꼴. 글꼴을 바꾸려면 font-family 의 이름을 바꿉니다 */
+/* ▼ [휴대폰 아래 막대 검정으로] 휴대폰 맨 아래 '뒤로·홈·최근' 3버튼 막대 뒤쪽을 검정으로 칠합니다 */
+html{background:#000} /* 소식지 바깥(맨 아래 막대 뒤) 바탕 = 검정. 휴대폰이 이 색을 보고 버튼을 흰색으로 바꿔 보여 줍니다 */
+body{min-height:100vh;margin-bottom:env(safe-area-inset-bottom)} /* 소식지 내용은 원래 바탕색 그대로. margin-bottom = 아래 막대 높이만큼 비워 두어 그 자리에 검정 바탕이 보이게 함 (수정 금지) */
 #app{max-width:480px;margin:0 auto;min-height:100vh;position:relative} /* 앱 폭: 최대 480px. 컴퓨터에서 봐도 휴대폰 크기로 가운데 표시됩니다 */
 .screen{display:none;min-height:100vh} /* 화면들은 평소엔 숨김 (수정 금지) */
 .screen.on{display:block}               /* 지금 보는 화면만 보이게 함 (수정 금지) */
