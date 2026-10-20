@@ -103,7 +103,7 @@ table{border-collapse:collapse;width:100%} /* 표 공통 설정 (수정 금지) 
 
 /* ▼ 나가기 버튼(걸어가는 사람 그림)과 풍선 말 — 홈 화면 왼쪽 아래 */
 .exit{position:absolute;left:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* left/bottom = 버튼 위치(왼쪽·아래에서 떨어진 거리), width/height = 크기, 배경 = 투명(transparent, 그림만 보임). 흰 원을 다시 원하면 transparent 를 rgba(255,255,255,.75) 로 바꾸세요 */
-.exit svg{width:30px;height:30px;fill:#111} /* 걸어가는 사람 그림의 크기(30px)와 색(검정) */
+.exit svg{width:30px;height:30px;fill:#111;transform:scaleX(-1)} /* 걸어가는 사람 그림의 크기(30px)와 색(검정). transform:scaleX(-1) = 그림을 좌우로 뒤집어 왼쪽을 보고 걷게 함 (지우면 다시 오른쪽을 봄) */
 .exit:active{transform:scale(.92)} /* 누를 때 살짝 작아지는 효과 */
 .tip{position:absolute;left:8px;bottom:62px;background:#333;color:#fff;font-size:14px;padding:7px 14px;border-radius:8px;max-width:calc(100% - 16px);opacity:0;pointer-events:none} /* 풍선 말: bottom:62px = 버튼 바로 위, 배경 짙은 회색, 글자 흰색 14px. 평소엔 투명(opacity:0)이라 안 보이고, 켜지면 곧바로 나타남. 긴 글은 화면 폭에 맞춰 줄바꿈 */
 .tip::after{content:"";position:absolute;left:20px;top:100%;border:7px solid transparent;border-top-color:#333} /* 풍선 아래의 작은 삼각형 꼬리 (색은 위의 #333 과 같게) */
