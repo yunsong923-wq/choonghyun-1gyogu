@@ -23,6 +23,8 @@
  ⑦ 바탕화면 아이콘 설치 팝업 : 홈 화면이 뜨고 1분 뒤 아래에서 올라오는 안내창 (아래 <script> 의 "⑦" 부분)
  ⑧ 목모임 보기             : 홈 아래 가운데 하늘색 두 사람 버튼 → 원형 숫자판 → 목모임 명단 (아래 <script> 의 "⑧" 부분)
     · 목모임 명단은 구글 시트의 '목모임' 탭에서 고칩니다.
+ ⑨ 실시간 예배 방송   : 홈 아래 보라색 비디오 카메라 버튼 → 풍선 '실시간 예배 방송을 보시겠습니까?' → 네 → 교회 유튜브 라이브
+    · 유튜브 주소는 아래 <script> 의 "⑨" 부분(LIVE_URL)에서 고칩니다.
  ★ 아이콘 설치를 위해 이 파일 옆에 아래 파일들이 함께 있어야 합니다. (GitHub 저장소 맨 위 폴더)
     manifest.json(앱 이름·아이콘 설정), sw.js(설치용 작동 파일),
     icons 폴더(아이콘 그림 4장: icon-192.png, icon-512.png, icon-maskable-512.png, apple-touch-icon.png)
@@ -100,7 +102,7 @@ header h2{margin:0;font-size:19px;font-weight:700} /* 제목 글자 크기(19px)
 table{border-collapse:collapse;width:100%} /* 표 공통 설정 (수정 금지) */
 
 /* ▼ 나가기 버튼(걸어가는 사람 그림)과 풍선 말 — 홈 화면 왼쪽 아래 */
-.exit{position:absolute;left:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:rgba(255,255,255,.75);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* left/bottom = 버튼 위치(왼쪽·아래에서 떨어진 거리), width/height = 크기, 배경 = 반투명 흰색 */
+.exit{position:absolute;left:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* left/bottom = 버튼 위치(왼쪽·아래에서 떨어진 거리), width/height = 크기, 배경 = 투명(transparent, 그림만 보임). 흰 원을 다시 원하면 transparent 를 rgba(255,255,255,.75) 로 바꾸세요 */
 .exit svg{width:30px;height:30px;fill:#111} /* 걸어가는 사람 그림의 크기(30px)와 색(검정) */
 .exit:active{transform:scale(.92)} /* 누를 때 살짝 작아지는 효과 */
 .tip{position:absolute;left:8px;bottom:62px;background:#333;color:#fff;font-size:14px;padding:7px 14px;border-radius:8px;max-width:calc(100% - 16px);opacity:0;pointer-events:none} /* 풍선 말: bottom:62px = 버튼 바로 위, 배경 짙은 회색, 글자 흰색 14px. 평소엔 투명(opacity:0)이라 안 보이고, 켜지면 곧바로 나타남. 긴 글은 화면 폭에 맞춰 줄바꿈 */
@@ -108,7 +110,7 @@ table{border-collapse:collapse;width:100%} /* 표 공통 설정 (수정 금지) 
 .tip.on{opacity:1} /* 풍선 말이 나타날 때 */
 
 /* ▼ 예배순서지(주보) 아이콘 + 풍선 — 홈 화면 오른쪽 아래. 나가기(걷는 사람) 버튼과 같은 높이에 있습니다 */
-.bul{position:absolute;right:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:rgba(255,255,255,.75);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* right/bottom = 아이콘 위치(오른쪽·아래에서 떨어진 거리), width/height = 크기 */
+.bul{position:absolute;right:12px;bottom:10px;width:46px;height:46px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* right/bottom = 아이콘 위치(오른쪽·아래에서 떨어진 거리), width/height = 크기, 배경 = 투명(transparent, 그림만 보임). 흰 원을 다시 원하면 transparent 를 rgba(255,255,255,.75) 로 바꾸세요 */
 .bul svg{width:30px;height:30px;fill:none;stroke:#e5566a;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round} /* 문서+돋보기 그림: 빨간 계열(#e5566a). 색을 바꾸려면 이 번호를 바꾸세요 */
 .bul:active{transform:scale(.92)} /* 누를 때 살짝 작아지는 효과 */
 .bq{display:none;position:absolute;right:8px;bottom:64px;z-index:6;min-width:210px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* 풍선: 아이콘 바로 위, 짙은 회색 바탕에 흰 글자. 평소엔 숨김(display:none) */
@@ -122,6 +124,18 @@ table{border-collapse:collapse;width:100%} /* 표 공통 설정 (수정 금지) 
 .bq .n{background:#e6e6e6;color:#111} /* '아니오' 버튼 색 */
 .bq .it{background:#fff;color:#111} /* 항목(주보, 금요집회) 버튼 색 */
 .bq button:active{transform:scale(.97)}
+
+/* ▼ ⑨ 실시간 예배 방송 버튼 + 풍선 — 홈 아래 왼쪽에서 세 번째 자리 (목모임과 주보 사이) */
+.liv{position:absolute;left:calc(35px + (100% - 70px)*2/3);bottom:10px;margin-left:-23px;width:46px;height:46px;border:0;border-radius:50%;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* left = 아이콘 4개를 같은 간격으로 놓는 계산(수정 금지), width/height = 크기, 배경 = 투명(transparent, 그림만 보임). 흰 원을 다시 원하면 transparent 를 rgba(255,255,255,.75) 로 바꾸세요 */
+.liv svg{width:34px;height:34px;fill:#8e2de2} /* 비디오 카메라 그림: 크기(34px)와 색(보라색 #8e2de2). 색을 바꾸려면 이 번호를 바꾸세요 */
+.liv:active{transform:scale(.92)} /* 누를 때 살짝 작아지는 효과 */
+.lq{display:none;position:absolute;right:8px;bottom:64px;z-index:6;width:230px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* 풍선: 버튼 위, 짙은 회색 바탕에 흰 글자. 평소엔 숨김 */
+.lq.on{display:block} /* 풍선이 나타날 때 */
+.lq .q{font-size:17px;font-weight:700;margin:0 0 10px;line-height:1.4} /* 풍선 속 질문 글자 */
+.lq .r{display:flex;gap:8px} /* 네 / 아니오 두 버튼을 나란히 */
+.lq button{flex:1;height:42px;border:0;border-radius:8px;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer} /* 풍선 속 버튼 공통 */
+.lq .y{background:#8e2de2;color:#fff} /* '네' 버튼 색 (보라색) */
+.lq .n{background:#e6e6e6;color:#111} /* '아니오' 버튼 색 */
 
 /* ▼ 종료 화면: 나가기를 눌러도 창이 안 닫힐 때 화면 전체를 덮어 보여 주는 안내 화면 */
 .bye{display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:20;background:var(--bg);color:var(--ink);align-items:center;justify-content:center;text-align:center;padding:24px} /* display:none = 평소엔 숨김. 배경은 연한 회색(위 색깔 모음의 --bg) */
@@ -199,10 +213,10 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 /* =====================================================================
    ⑧ 목모임: 하늘색 두 사람 버튼 + 풍선 + 원형 숫자판 + 명단 화면
    ===================================================================== */
-.mok{position:absolute;left:50%;bottom:10px;margin-left:-24px;width:48px;height:48px;border:0;border-radius:8px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* 홈 아래 가운데 목모임 버튼: 바탕 없이(transparent) 그림만 보임, 누르는 자리 크기 48px */
+.mok{position:absolute;left:calc(35px + (100% - 70px)/3);bottom:10px;margin-left:-24px;width:48px;height:48px;border:0;border-radius:8px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0} /* [⑨ 추가로 위치 변경] 아이콘 4개를 같은 간격으로: 왼쪽에서 두 번째 자리. 목모임 버튼: 바탕 없이(transparent) 그림만 보임, 누르는 자리 크기 48px */
 .mok svg{width:44px;height:40px;fill:#1bdaf1} /* 하늘색 두 사람 그림: 크기(너비 44px·높이 40px)와 색(하늘색 #1bdaf1). 색을 바꾸려면 이 번호를 바꾸세요 */
 .mok:active{transform:scale(.92)}
-.mkq{display:none;position:absolute;left:50%;bottom:66px;transform:translateX(-50%);z-index:6;min-width:220px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* '목모임을 열까요?' 풍선: 버튼 바로 위 가운데 */
+.mkq{display:none;position:absolute;left:calc(35px + (100% - 70px)/3);bottom:66px;transform:translateX(-50%);z-index:6;min-width:220px;padding:12px 14px;border-radius:12px;background:#333;color:#fff;text-align:center} /* '목모임을 열까요?' 풍선: 버튼 바로 위 가운데 */
 .mkq.on{display:block}
 .mkq::after{content:"";position:absolute;left:50%;margin-left:-8px;top:100%;border:8px solid transparent;border-top-color:#333} /* 풍선 아래 꼬리 (버튼을 가리킴) */
 .mkq .q{font-size:17px;font-weight:700;margin:0 0 10px}
@@ -268,6 +282,9 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 <!-- ⑧ 목모임 버튼: 하늘색 두 사람 그림 (나가기와 주보 아이콘 사이 가운데). 누르면 '목모임을 열까요?' 풍선이 나옵니다 (동작은 아래 ⑧ 목모임 부분) -->
 <button class="mok" id="mokBtn" aria-label="목모임"><svg viewBox="2 2 58 52"><ellipse cx="21.5" cy="13.5" rx="7.6" ry="10.5"/><ellipse cx="42.5" cy="13.5" rx="7.6" ry="10.5"/><path d="M3 53V44C3 37 11 32 21.5 32C32 32 40 37 40 44V53Z"/><path d="M45 53V41C45 37 43.5 34 41 32C50 32 59 36 59 43V53Z"/></svg></button> <!-- 그림 순서: 왼쪽 머리, 오른쪽 머리, 왼쪽(앞) 사람 몸, 오른쪽(뒤) 사람 몸 -->
 <div class="mkq" id="mkq"></div> <!-- 목모임 풍선이 들어가는 자리 (내용은 프로그램이 채웁니다) -->
+<!-- ⑨ 실시간 예배 방송 버튼: 보라색 비디오 카메라(+) 그림. 누르면 '실시간 예배 방송을 보시겠습니까?' 풍선이 나옵니다 (동작은 아래 ⑨ 부분) -->
+<button class="liv" id="livBtn" aria-label="실시간 예배 방송"><svg viewBox="0 0 24 24"><path d="M3 6.5A1.5 1.5 0 0 1 4.5 5h11A1.5 1.5 0 0 1 17 6.5v3.2l4-2.7v10l-4-2.7v3.2a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 3 17.5zM9 8.5v2.5H6.5v2H9v2.5h2V13h2.5v-2H11V8.5z" fill-rule="evenodd"/></svg></button> <!-- 그림: 카메라 몸통(네모) + 오른쪽 렌즈(삼각형) + 가운데 흰 십자(+) 구멍 -->
+<div class="lq" id="lq"></div> <!-- 실시간 방송 풍선이 들어가는 자리 (내용은 프로그램이 채웁니다) -->
 </div>
 <table class="info" id="info"></table> <!-- 맨 아래 협력교회·직책 표가 들어가는 자리 -->
 </section>
@@ -759,7 +776,7 @@ function show(name){
  SCREENS.forEach(function(n){document.getElementById(n).classList.toggle("on",n===name)});
  window.scrollTo(0,0);
  if(name==="home"){startMq();insTry()}  /* 홈으로 오면 문구 흐름 시작 + (때가 되었으면) ⑦ 아이콘 설치 안내 */
- else{insHide(true);mokClose()}         /* 다른 화면으로 가면 설치 안내창·목모임 풍선은 잠시 내려 둠 */
+ else{insHide(true);mokClose();liveClose()}         /* 다른 화면으로 가면 설치 안내창·목모임 풍선은 잠시 내려 둠 */
 }
 
 /* 버튼을 눌렀을 때의 동작 — 수정 금지.
@@ -874,6 +891,7 @@ function bulItems(){ /* 2단계: 주보 / 금요집회 항목 보여 주기 — 
 bulBtn.addEventListener("click",function(e){ /* 아이콘을 누르면: 풍선이 있으면 닫고, 없으면 1단계 열기 — 수정 금지 */
  e.stopPropagation();
  document.getElementById("tip").classList.remove("on"); /* 나가기 풍선이 떠 있으면 숨김 */
+ liveClose(); /* ⑨ 실시간 방송 풍선도 닫기 */
  if(bulBox.classList.contains("on"))bulClose();else bulAsk();
 });
 bulBox.addEventListener("click",function(e){ /* 풍선 안의 버튼을 눌렀을 때 — 수정 금지 */
@@ -887,6 +905,38 @@ bulBox.addEventListener("click",function(e){ /* 풍선 안의 버튼을 눌렀�
 });
 document.addEventListener("click",bulClose); /* 풍선 바깥 아무 곳이나 누르면 닫힘 — 수정 금지 */
 window.addEventListener("pageshow",bulClose); /* 순서지에서 '뒤로가기'로 돌아왔을 때 풍선이 남아 있지 않게 함 — 수정 금지 */
+
+/* =====================================================================
+   ⑨ 실시간 예배 방송 (홈 아래 보라색 비디오 카메라 버튼)
+   ---------------------------------------------------------------------
+   순서: 버튼 누름 → 풍선 '실시간 예배 방송을 보시겠습니까?' + [네][아니오]
+         · 아니오 → 풍선 닫힘
+         · 네     → 교회 유튜브 채널의 '실시간(라이브)' 화면으로 이동
+           (방송 중이면 바로 방송이 나오고, 방송이 없을 때는 채널 화면이 나옵니다.
+            휴대폰에 유튜브 앱이 있으면 대개 유튜브 앱으로 열립니다.)
+   수정 가능한 값은 아래와 같습니다.
+   ===================================================================== */
+var LIVE_URL="https://www.youtube.com/@choonghyun_church/live"; /* 교회 유튜브 실시간 방송 주소. 끝의 /live 를 지우면 채널 첫 화면으로 갑니다 */
+var LIVE_ASK="실시간 예배 방송을\n보시겠습니까?"; /* 풍선 글자 (\n 은 줄바꿈) */
+var LIVE_YES="네";      /* 첫 번째 선택 글자 */
+var LIVE_NO="아니오";   /* 두 번째 선택 글자 */
+var lvBtn=document.getElementById("livBtn"),lvBox=document.getElementById("lq");
+function liveClose(){lvBox.classList.remove("on")} /* 풍선 닫기 — 수정 금지 */
+lvBtn.addEventListener("click",function(e){ /* 버튼을 누르면: 풍선이 있으면 닫고, 없으면 열기 — 수정 금지 */
+ e.stopPropagation();
+ bulClose();mokClose();document.getElementById("tip").classList.remove("on"); /* 다른 풍선들은 닫기 */
+ if(lvBox.classList.contains("on")){liveClose();return}
+ lvBox.innerHTML='<div class="q">'+esc(LIVE_ASK).replace(/\n/g,"<br>")+'</div><div class="r"><button class="y" data-a="y">'+esc(LIVE_YES)+'</button><button class="n" data-a="n">'+esc(LIVE_NO)+'</button></div>';
+ lvBox.classList.add("on");
+});
+lvBox.addEventListener("click",function(e){ /* 풍선 속 버튼 — 수정 금지 */
+ e.stopPropagation();
+ var b=e.target.closest("button");if(!b)return;
+ liveClose();
+ if(b.dataset.a==="y")location.href=LIVE_URL; /* 네 → 유튜브 실시간 방송으로 이동 (아니오 → 그냥 닫힘) */
+});
+document.addEventListener("click",liveClose);     /* 풍선 바깥을 누르면 닫힘 — 수정 금지 */
+window.addEventListener("pageshow",liveClose);    /* 유튜브에서 '뒤로가기'로 돌아왔을 때 풍선이 남아 있지 않게 함 — 수정 금지 */
 
 /* =====================================================================
    ⑦ 바탕화면 아이콘 설치 안내 (홈 화면이 뜨고 1분 뒤 아래에서 올라오는 안내창)
@@ -1083,7 +1133,7 @@ var mkTimer=null,mkHeld=false,mkDown=-1,mkX=0,mkY=0; /* 길게 누르기 확인�
 function mokClose(){mkBox.classList.remove("on")} /* 풍선 닫기 — 수정 금지 */
 mkBtn.addEventListener("click",function(e){ /* 버튼을 누르면: 풍선이 있으면 닫고, 없으면 열기 — 수정 금지 */
  e.stopPropagation();
- bulClose();document.getElementById("tip").classList.remove("on"); /* 주보 풍선·나가기 풍선은 닫기 */
+ bulClose();liveClose();document.getElementById("tip").classList.remove("on"); /* 주보·실시간 방송·나가기 풍선은 닫기 */
  if(mkBox.classList.contains("on")){mokClose();return}
  mkBox.innerHTML='<div class="q">'+esc(MOK_ASK)+'</div><div class="r"><button class="y" data-a="y">'+esc(MOK_YES)+'</button><button class="n" data-a="n">'+esc(MOK_NO)+'</button></div>';
  mkBox.classList.add("on");
