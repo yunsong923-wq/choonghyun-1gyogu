@@ -7,7 +7,7 @@
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
+  "background_color": "#000000",
   "theme_color": "#ffe930",
   "related_applications": [
     { "platform": "webapp", "url": "https://yunsong923-wq.github.io/choonghyun-1gyogu/manifest.json" }
