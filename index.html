@@ -264,6 +264,39 @@ a.big{display:flex;align-items:center;justify-content:center;text-decoration:non
 .mk-r{display:flex;border-bottom:1px solid var(--line)}.mk-r:last-child{border-bottom:0} /* 순 한 줄 */
 .mk-n{width:72px;flex:none;display:flex;align-items:center;justify-content:center;text-align:center;padding:10px 4px;font-weight:700;font-size:14px;border-right:1px solid var(--line);word-break:keep-all} /* 순장 이름 칸: 굵게 14px */
 .mk-m{padding:10px;font-size:13px;line-height:1.7;display:flex;flex-wrap:wrap;align-content:center;gap:2px 14px} /* 순원 이름들: 13px, 칸이 모자라면 다음 줄로 */
+
+/* =====================================================================
+   ★ [야광 효과 — 일부만 적용] (index_temp 시험용)
+   · 맨 위 흐르는 말씀 문구 : 검은 띠 위에 청록색으로 빛나는 글자 (전광판 느낌)
+   · 홈 아래 아이콘 4개     : 검은 동그라미 위에서 각자 색으로 빛나게
+   · 빛나 보이는 원리: 글자·그림에 같은 색 그림자를 흐리게 번지게 하는 것입니다
+     (글자는 text-shadow, 그림은 filter:drop-shadow).
+   · 이 묶음을 통째로 지우면 원래 모양으로 돌아갑니다.
+   · 빛을 약하게 하려면 px 숫자(번지는 크기)를 줄이세요.
+   ===================================================================== */
+
+/* ▼ 흐르는 말씀 문구: 검은 띠 + 빛나는 글자 */
+.mq{
+ background:#000;                 /* 띠 바탕색: 검정 (빛이 잘 보이게) */
+ color:#3cf2d0;                   /* 글자색: 야광 청록 */
+ text-shadow:0 0 4px #3cf2d0,0 0 10px rgba(60,242,208,.55); /* 빛 번짐: 4px 진하게 + 10px 은은하게 */
+ padding:7px 0;                   /* 띠 위아래 두께 */
+ border-radius:6px;               /* 띠 모서리를 살짝 둥글게 */
+ box-shadow:0 0 0 1px rgba(60,242,208,.35),0 2px 8px rgba(0,0,0,.35); /* 띠 테두리의 얇은 빛 + 아래 그림자 */
+}
+
+/* ▼ 아이콘 4개(나가기·목모임·실시간 예배·주보) 공통: 검은 동그라미 바탕 */
+.exit,.mok,.liv,.bul{
+ background:#000!important;       /* 바탕: 검정 동그라미 */
+ border-radius:50%!important;     /* 동그랗게 */
+ box-shadow:0 0 6px rgba(0,0,0,.4); /* 동그라미가 사진에서 살짝 떠 보이게 */
+}
+/* ▼ 아이콘별 빛 — [약하게 조정] 번짐 크기 1.5px, 진하기 .45 로 아주 살짝만 빛나게.
+   더 약하게: 1.5px → 1px 또는 .45 → .3 / 빛을 아예 없애려면 filter 부분을 지우세요 */
+.exit svg{fill:#3cf2d0;filter:drop-shadow(0 0 1.5px rgba(60,242,208,.45))}  /* 나가기(걷는 사람): 청록 */
+.mok svg{fill:#4fe6ff;filter:drop-shadow(0 0 1.5px rgba(79,230,255,.45))}   /* 목모임(두 사람): 하늘색 */
+.liv svg{fill:#c08cff;filter:drop-shadow(0 0 1.5px rgba(192,140,255,.45))}  /* 실시간 예배(카메라): 보라 */
+.bul svg{stroke:#ff6b81;filter:drop-shadow(0 0 1.5px rgba(255,107,129,.45))} /* 주보(문서): 분홍빛 빨강 */
 </style>
 </head>
 <body>
